@@ -18,11 +18,11 @@ export async function AuthButton() {
       <LogoutButton />
     </div>
   ) : (
-    <div className="flex gap-2">
-      <Link href="/auth/login" className="glass-button text-sm">
+    <div className="flex items-center gap-4">
+      <Link href="/auth/login" className="text-sm opacity-70 hover:opacity-100 underline underline-offset-4 transition-opacity">
         Sign In
       </Link>
-      <Link href="/auth/sign-up" className="glass-cta text-sm">
+      <Link href="/auth/sign-up" className="glass-cta text-sm !px-6 !py-3">
         Sign Up
       </Link>
     </div>

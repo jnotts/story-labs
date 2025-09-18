@@ -31,28 +31,21 @@ export function Pillar({ items, side, className = "" }: PillarProps) {
           const content = (
             <>
               <Icon
-                className={`h-5 w-5 transition-opacity ${
+                className={`h-4 w-4 flex-shrink-0 transition-opacity ${
                   isActive
                     ? "opacity-100"
                     : "opacity-60 group-hover:opacity-100"
                 }`}
               />
-              <span
-                className={`text-xs transition-opacity ${
-                  isActive ? "opacity-100" : "opacity-40 group-hover:opacity-70"
-                }`}
-              >
-                {label}
-              </span>
             </>
           );
 
           const sharedClasses = `
-            group flex flex-col items-center gap-2 p-3 rounded-full transition-all duration-300
+            group flex items-center justify-center p-3 rounded-full transition-all duration-300 w-12 h-12
             ${
               isActive
                 ? "bg-white/10 shadow-lg"
-                : "hover:bg-white/10 hover:scale-105"
+                : "hover:bg-white/10"
             }
             ${comingSoon ? "opacity-50 cursor-not-allowed" : ""}
           `;
