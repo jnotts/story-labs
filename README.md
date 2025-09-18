@@ -1,6 +1,6 @@
 # Story Labs
 
-Interactive storytelling app with AI narration - built in a 2-hour speed-run.
+Interactive storytelling app with AI narration - initial build in a 2-hour speed-run.
 
 ## Project Brief
 Create an interactive storytelling platform where users write stories and generate AI narration. Focus on creative writing experience with glassmorphism UI over mountain backgrounds.
