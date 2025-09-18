@@ -58,63 +58,79 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
-              </Button>
+      <div className="glass-panel p-8">
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-2xl font-bold">Join Story Labs</h1>
+          <p className="text-muted-foreground">
+            Create your account to start crafting stories
+          </p>
+        </div>
+
+        <form onSubmit={handleSignUp}>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+              />
             </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
-              </Link>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+              />
             </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            <div className="space-y-2">
+              <Label htmlFor="repeat-password" className="text-sm font-medium">Confirm Password</Label>
+              <Input
+                id="repeat-password"
+                type="password"
+                required
+                value={repeatPassword}
+                onChange={(e) => setRepeatPassword(e.target.value)}
+                className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+              />
+            </div>
+
+            {error && (
+              <div className="glass-panel p-4 bg-red-500/10 border-red-500/20">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="glass-cta w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create Account"}
+            </button>
+          </div>
+
+          <div className="mt-6 text-center text-sm opacity-70">
+            Already have an account?{" "}
+            <Link
+              href="/auth/login"
+              className="opacity-100 hover:underline"
+            >
+              Sign in
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

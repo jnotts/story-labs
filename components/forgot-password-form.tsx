@@ -47,58 +47,67 @@ export function ForgotPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+        <div className="glass-panel p-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold">Check Your Email</h1>
+            <p className="text-muted-foreground">
+              Password reset instructions have been sent to your email.
             </p>
-          </CardContent>
-        </Card>
+            <p className="text-sm opacity-70">
+              If you don't see the email, check your spam folder.
+            </p>
+          </div>
+        </div>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+        <div className="glass-panel p-8">
+          <div className="text-center space-y-2 mb-8">
+            <h1 className="text-2xl font-bold">Reset Password</h1>
+            <p className="text-muted-foreground">
+              Enter your email to receive a reset link
+            </p>
+          </div>
+
+          <form onSubmit={handleForgotPassword}>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+                />
+              </div>
+
+              {error && (
+                <div className="glass-panel p-4 bg-red-500/10 border-red-500/20">
+                  <p className="text-sm text-red-400">{error}</p>
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              )}
+
+              <button
+                type="submit"
+                className="glass-cta w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Sending..." : "Send Reset Link"}
+              </button>
+            </div>
+
+            <div className="mt-6 text-center text-sm opacity-70">
+              Remember your password?{" "}
+              <Link
+                href="/auth/login"
+                className="opacity-100 hover:underline"
+              >
+                Back to login
+              </Link>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   );

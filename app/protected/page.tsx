@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon } from "lucide-react";
-import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
+import { NavPillar } from "@/components/floating-nav";
+import { ControlPanel } from "@/components/control-panel";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
@@ -13,24 +12,70 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
+    <div className="min-h-screen relative">
+      {/* Left Navigation Pillar */}
+      <NavPillar activeSection="create" />
+
+      {/* Right Control Panel */}
+      <ControlPanel mode="create" />
+
+      {/* Central Creative Space */}
+      <main className="px-24 py-16 min-h-screen flex flex-col">
+        {/* Floating Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-3xl font-light mb-3 opacity-60">
+            Begin Your Story
+          </h1>
+          <p className="text-sm opacity-40">
+            Let your imagination flow into the infinite space...
+          </p>
         </div>
-      </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(data.claims, null, 2)}
-        </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
-      </div>
+
+        {/* Infinite Writing Space */}
+        <div className="flex-1 max-w-4xl mx-auto w-full flex flex-col">
+          {/* Title Input */}
+          <div className="mb-12">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Untitled Story"
+                className="w-full bg-transparent rounded-lg px-4 py-3 text-2xl font-light text-center
+                 placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0 
+                 focus:placeholder:opacity-50  transition-all outline-none"
+              />
+            </div>
+            <div className="h-px bg-white/5 mt-4 mx-auto w-32"></div>
+          </div>
+
+          {/* Main Writing Area - Infinite Feel */}
+          <div className="flex-1 relative">
+            <textarea
+              placeholder="Once upon a time..."
+              className="w-full h-full min-h-[60vh] bg-[#ffffff01] rounded-2xl p-6 resize-none 
+              placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0 
+              text-lg leading-relaxed focus:placeholder:opacity-50 transition-all outline-none"
+              style={{
+                height: "calc(100vh - 300px)",
+                overflow: "auto",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Floating Action Bar */}
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
+          <div className="glass-nav px-6 py-3 flex items-center gap-6">
+            <div className="text-xs opacity-40">0 words</div>
+            <div className="w-px h-4 bg-white/10"></div>
+            <button className="text-xs opacity-60 hover:opacity-100 transition-opacity">
+              Save Draft
+            </button>
+            <button className="text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all">
+              Generate Audio
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

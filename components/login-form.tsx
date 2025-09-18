@@ -49,62 +49,75 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
+      <div className="glass-panel p-8">
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-2xl font-bold">Welcome Back</h1>
+          <p className="text-muted-foreground">
+            Sign in to your Story Labs account
+          </p>
+        </div>
+
+        <form onSubmit={handleLogin}>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+              />
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm opacity-70 hover:opacity-100 transition-opacity"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="glass-button border-0 bg-white/10 backdrop-blur-sm"
+              />
             </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            {error && (
+              <div className="glass-panel p-4 bg-red-500/10 border-red-500/20">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="glass-cta w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </button>
+          </div>
+
+          <div className="mt-6 text-center text-sm opacity-70">
+            Don't have an account?{" "}
+            <Link
+              href="/auth/sign-up"
+              className="opacity-100 hover:underline"
+            >
+              Create account
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

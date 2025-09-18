@@ -29,6 +29,15 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    /* Liquid Glass Variables */
+    --glass-bg: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-strong: rgba(255, 255, 255, 0.3);
+    --story-bg: rgba(67, 67, 67, 0.5);
+    --story-dark: #0a0a0a;
+    --accent-neutral: rgba(0, 0, 0, 0.8);
+    --accent-light: rgba(0, 0, 0, 0.6);
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -55,6 +64,15 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Dark mode liquid glass */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-strong: rgba(255, 255, 255, 0.18);
+    --story-bg: rgba(10, 10, 10, 0.75);
+    --story-dark: #fafbfc;
+    --accent-neutral: rgba(255, 255, 255, 0.9);
+    --accent-light: rgba(255, 255, 255, 0.7);
   }
 }
 
@@ -62,7 +80,69 @@
   * {
     @apply border-border;
   }
+
+  /* Remove all focus outlines for seamless writing experience */
+  input, textarea {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  input:focus, textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-image: url('/images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--story-bg);
+    /* opacity: 0.50; */
+    z-index: -1;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-2xl rounded-2xl shadow-2xl shadow-black/10;
+  }
+
+  .glass-nav {
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-2xl rounded-xl shadow-xl shadow-black/10;
+  }
+
+  .glass-button {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-lg rounded-full px-6 py-3 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:bg-white/5;
+  }
+
+  .glass-cta {
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--accent-neutral);
+    @apply backdrop-blur-xl rounded-full px-8 py-4 font-medium transition-all duration-300 hover:shadow-2xl hover:scale-[1.05] hover:bg-white/10;
+  }
+
+  .glass-strong {
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+    @apply backdrop-blur-xl rounded-xl;
   }
 }
