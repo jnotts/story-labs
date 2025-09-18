@@ -92,6 +92,22 @@
     box-shadow: none !important;
   }
 
+  /* Hide scrollbars for textarea while maintaining scroll functionality */
+  .hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  /* Prevent main page scroll */
+  html, body {
+    overflow: hidden;
+    height: 100vh;
+  }
+
   body {
     @apply text-foreground;
     background-image: url('/images/bg.jpg');

@@ -12,7 +12,7 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="h-screen relative overflow-hidden">
       {/* Left Navigation Pillar */}
       <NavPillar activeSection="create" />
 
@@ -20,7 +20,7 @@ export default async function ProtectedPage() {
       <ControlPanel mode="create" />
 
       {/* Central Creative Space */}
-      <main className="px-24 py-16 min-h-screen flex flex-col">
+      <main className="px-24 py-16 h-screen flex flex-col">
         {/* Floating Header */}
         <div className="text-center mb-16">
           <h1 className="text-3xl font-light mb-3 opacity-60">
@@ -48,15 +48,15 @@ export default async function ProtectedPage() {
           </div>
 
           {/* Main Writing Area - Infinite Feel */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative pb-24">
             <textarea
               placeholder="Once upon a time..."
-              className="w-full h-full min-h-[60vh] bg-[#ffffff01] rounded-2xl p-6 resize-none 
-              placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0 
+              className="w-full h-full bg-[#ffffff01] rounded-2xl p-6 resize-none hide-scrollbar
+              placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0
               text-lg leading-relaxed focus:placeholder:opacity-50 transition-all outline-none"
               style={{
-                height: "calc(100vh - 300px)",
                 overflow: "auto",
+                paddingBottom: "120px"
               }}
             />
           </div>
