@@ -7,7 +7,9 @@ export async function createStory(
   const supabase = createClient();
 
   // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     console.error("No authenticated user found");
     return null;
@@ -58,9 +60,17 @@ export async function updateStory(
 export async function getStories(): Promise<Story[]> {
   const supabase = createClient();
 
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error("No authenticated user found");
+    return [];
+  }
+
   const { data: stories, error } = await supabase
     .from("stories")
     .select("*")
+    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   if (error) {

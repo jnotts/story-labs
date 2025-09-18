@@ -7,6 +7,7 @@ import { NavPillar } from "@/components/floating-nav";
 import { ControlPanel } from "@/components/control-panel";
 import { createStory, updateStory, getStory } from "@/lib/stories";
 import { Story } from "@/lib/types";
+import { Tooltip } from "@/components/tooltip";
 
 export function StoryEditor() {
   const [title, setTitle] = useState("");
@@ -200,9 +201,11 @@ export function StoryEditor() {
             >
               {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
             </button>
-            <button className="text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all">
-              Generate Audio
-            </button>
+            <Tooltip content="Coming Soon">
+              <button className="text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all opacity-50 cursor-not-allowed">
+                Generate Audio
+              </button>
+            </Tooltip>
           </div>
         </div>
       </main>

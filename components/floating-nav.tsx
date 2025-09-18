@@ -31,6 +31,7 @@ export function NavPillar({ activeSection = "create", onCreateNew }: NavPillarPr
       label: "Profile",
       href: "/create/profile",
       isActive: activeSection === "profile",
+      comingSoon: true,
     },
     {
       id: "settings",
@@ -38,6 +39,7 @@ export function NavPillar({ activeSection = "create", onCreateNew }: NavPillarPr
       label: "Settings",
       href: "/create/settings",
       isActive: activeSection === "settings",
+      comingSoon: true,
     },
   ];
 

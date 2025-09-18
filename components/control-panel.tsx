@@ -32,24 +32,28 @@ export function ControlPanel({ mode = "create", isEditing = false, onCreateNew }
         icon: Volume2,
         label: "Voice",
         onClick: () => console.log("Voice settings"),
+        comingSoon: true,
       },
       {
         id: "enhance",
         icon: Sparkles,
         label: "Enhance",
         onClick: () => console.log("AI enhance"),
+        comingSoon: true,
       },
       {
         id: "read",
         icon: BookOpenText,
         label: "Read",
         onClick: () => console.log("Read story"),
+        comingSoon: true,
       },
       {
         id: "share",
         icon: Share2,
         label: "Share",
         onClick: () => console.log("Share story"),
+        comingSoon: true,
       },
     ];
 
@@ -63,12 +67,14 @@ export function ControlPanel({ mode = "create", isEditing = false, onCreateNew }
       icon: Search,
       label: "Search",
       onClick: () => console.log("Search stories"),
+      comingSoon: true,
     },
     {
       id: "filter",
       icon: Filter,
       label: "Filter",
       onClick: () => console.log("Filter stories"),
+      comingSoon: true,
     },
   ];
 
