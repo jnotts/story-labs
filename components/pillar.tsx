@@ -19,7 +19,7 @@ interface PillarProps {
 }
 
 export function Pillar({ items, side, className = "" }: PillarProps) {
-  const baseClasses = `fixed top-0 bottom-0 w-16 flex flex-col items-center justify-center z-50 ${className}`;
+  const baseClasses = `fixed top-1/2 -translate-y-1/2 z-50 ${className}`;
   const positionClasses = side === "left" ? "left-6" : "right-6";
 
   return (

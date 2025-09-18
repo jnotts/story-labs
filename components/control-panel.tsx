@@ -1,39 +1,56 @@
 "use client";
 
-import { Volume2, Download, Share2, Sparkles, Search, Filter } from "lucide-react";
+import {
+  Volume2,
+  // Download,
+  Share2,
+  Sparkles,
+  Search,
+  Filter,
+  BookOpenText,
+  Plus,
+} from "lucide-react";
 import { Pillar } from "./pillar";
 
 interface ControlPanelProps {
-  mode?: 'create' | 'library';
+  mode?: "create" | "library";
+  isEditing?: boolean;
+  onCreateNew?: () => void;
 }
 
-export function ControlPanel({ mode = 'create' }: ControlPanelProps) {
-  if (mode === 'create') {
+export function ControlPanel({ mode = "create", isEditing = false, onCreateNew }: ControlPanelProps) {
+  if (mode === "create") {
     const createControls = [
+      ...(isEditing && onCreateNew ? [{
+        id: "new",
+        icon: Plus,
+        label: "New",
+        onClick: onCreateNew,
+      }] : []),
       {
-        id: 'voice',
+        id: "voice",
         icon: Volume2,
-        label: 'Voice',
-        onClick: () => console.log('Voice settings')
+        label: "Voice",
+        onClick: () => console.log("Voice settings"),
       },
       {
-        id: 'enhance',
+        id: "enhance",
         icon: Sparkles,
-        label: 'Enhance',
-        onClick: () => console.log('AI enhance')
+        label: "Enhance",
+        onClick: () => console.log("AI enhance"),
       },
       {
-        id: 'export',
-        icon: Download,
-        label: 'Export',
-        onClick: () => console.log('Export story')
+        id: "read",
+        icon: BookOpenText,
+        label: "Read",
+        onClick: () => console.log("Read story"),
       },
       {
-        id: 'share',
+        id: "share",
         icon: Share2,
-        label: 'Share',
-        onClick: () => console.log('Share story')
-      }
+        label: "Share",
+        onClick: () => console.log("Share story"),
+      },
     ];
 
     return <Pillar items={createControls} side="right" />;
@@ -42,17 +59,17 @@ export function ControlPanel({ mode = 'create' }: ControlPanelProps) {
   // Library mode - different controls
   const libraryControls = [
     {
-      id: 'search',
+      id: "search",
       icon: Search,
-      label: 'Search',
-      onClick: () => console.log('Search stories')
+      label: "Search",
+      onClick: () => console.log("Search stories"),
     },
     {
-      id: 'filter',
+      id: "filter",
       icon: Filter,
-      label: 'Filter',
-      onClick: () => console.log('Filter stories')
-    }
+      label: "Filter",
+      onClick: () => console.log("Filter stories"),
+    },
   ];
 
   return <Pillar items={libraryControls} side="right" />;

@@ -1,23 +1,143 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { NavPillar } from "@/components/floating-nav";
 import { ControlPanel } from "@/components/control-panel";
+import { createStory, updateStory, getStory } from "@/lib/stories";
+import { Story } from "@/lib/types";
 
-export default async function ProtectedPage() {
-  const supabase = await createClient();
+export default function ProtectedPage() {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [currentStory, setCurrentStory] = useState<Story | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
+  const [wordCount, setWordCount] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) {
-    redirect("/auth/login");
-  }
+  // Check auth and load story if editing
+  useEffect(() => {
+    const checkAuthAndLoadStory = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getClaims();
+      if (error || !data?.claims) {
+        router.push("/auth/login");
+        return;
+      }
+
+      // Check if we're editing an existing story
+      const editId = searchParams.get('edit');
+      if (editId) {
+        const story = await getStory(editId);
+        if (story) {
+          setCurrentStory(story);
+          setTitle(story.title);
+          setContent(story.content);
+          setSaveStatus("saved");
+        }
+      } else {
+        // Fresh load - ensure blank slate
+        setCurrentStory(null);
+        setTitle("");
+        setContent("");
+        setSaveStatus("saved");
+      }
+    };
+    checkAuthAndLoadStory();
+  }, [router, searchParams]);
+
+  // Update word count
+  useEffect(() => {
+    const words = content.trim().split(/\s+/).filter(word => word.length > 0);
+    setWordCount(words.length);
+  }, [content]);
+
+  // Save story function
+  const saveStory = useCallback(async () => {
+    if (!title.trim() && !content.trim()) return;
+
+    setSaveStatus("saving");
+
+    try {
+      if (currentStory) {
+        // Update existing story
+        const updated = await updateStory(currentStory.id, { title, content });
+        if (updated) {
+          setCurrentStory(updated);
+          setSaveStatus("saved");
+        }
+      } else {
+        // Create new story
+        const newStory = await createStory({ title: title || "Untitled Story", content });
+        if (newStory) {
+          setCurrentStory(newStory);
+          setSaveStatus("saved");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving story:", error);
+      setSaveStatus("unsaved");
+    }
+  }, [title, content, currentStory]);
+
+  // Mark as unsaved when content changes
+  useEffect(() => {
+    if (currentStory) {
+      // Editing existing story - check if different from saved version
+      if (title !== currentStory.title || content !== currentStory.content) {
+        setSaveStatus("unsaved");
+      } else {
+        setSaveStatus("saved");
+      }
+    } else {
+      // Creating new story - mark as unsaved if there's any content
+      if (title.trim() || content.trim()) {
+        setSaveStatus("unsaved");
+      } else {
+        setSaveStatus("saved");
+      }
+    }
+  }, [title, content, currentStory]);
+
+  // Auto-save with debouncing
+  useEffect(() => {
+    if (!title.trim() && !content.trim()) return;
+
+    const timeoutId = setTimeout(() => {
+      if (saveStatus === "unsaved") {
+        saveStory();
+      }
+    }, 2000); // Auto-save after 2 seconds of inactivity
+
+    return () => clearTimeout(timeoutId);
+  }, [title, content, saveStatus, saveStory]);
+
+  // Create new story function
+  const handleCreateNew = useCallback(async () => {
+    const hasContent = title.trim() || content.trim();
+
+    if (hasContent) {
+      // Auto-save current work first
+      await saveStory();
+    }
+
+    // Navigate to fresh create page
+    router.push("/protected");
+  }, [title, content, saveStory, router]);
 
   return (
     <div className="h-screen relative overflow-hidden">
       {/* Left Navigation Pillar */}
-      <NavPillar activeSection="create" />
+      <NavPillar activeSection="create" onCreateNew={handleCreateNew} />
 
       {/* Right Control Panel */}
-      <ControlPanel mode="create" />
+      <ControlPanel
+        mode="create"
+        isEditing={!!currentStory}
+        onCreateNew={handleCreateNew}
+      />
 
       {/* Central Creative Space */}
       <main className="px-24 py-16 h-screen flex flex-col">
@@ -39,8 +159,10 @@ export default async function ProtectedPage() {
               <input
                 type="text"
                 placeholder="Untitled Story"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-transparent rounded-lg px-4 py-3 text-2xl font-light text-center
-                 placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0 
+                 placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0
                  focus:placeholder:opacity-50  transition-all outline-none"
               />
             </div>
@@ -51,6 +173,8 @@ export default async function ProtectedPage() {
           <div className="flex-1 relative pb-24">
             <textarea
               placeholder="Once upon a time..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               className="w-full h-full bg-[#ffffff01] rounded-2xl p-6 resize-none hide-scrollbar
               placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0
               text-lg leading-relaxed focus:placeholder:opacity-50 transition-all outline-none"
@@ -65,10 +189,16 @@ export default async function ProtectedPage() {
         {/* Floating Action Bar */}
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
           <div className="glass-nav px-6 py-3 flex items-center gap-6">
-            <div className="text-xs opacity-40">0 words</div>
+            <div className="text-xs opacity-40">{wordCount} words</div>
             <div className="w-px h-4 bg-white/10"></div>
-            <button className="text-xs opacity-60 hover:opacity-100 transition-opacity">
-              Save Draft
+            <button
+              onClick={saveStory}
+              className={`text-xs transition-opacity w-20 text-center ${
+                saveStatus === "saving" ? "opacity-40" : "opacity-60 hover:opacity-100"
+              }`}
+              disabled={saveStatus === "saving"}
+            >
+              {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
             </button>
             <button className="text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all">
               Generate Audio

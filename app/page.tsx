@@ -2,8 +2,12 @@ import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const isAuthenticated = !!data?.claims;
   return (
     <main className="min-h-screen relative flex flex-col">
       {/* Minimal floating navigation */}
@@ -39,8 +43,11 @@ export default function Home() {
           </div>
 
           <div className="space-y-4">
-            <Link href="/auth/login" className="glass-cta inline-block">
-              Begin Creating
+            <Link
+              href={isAuthenticated ? "/protected" : "/auth/login"}
+              className="glass-cta inline-block"
+            >
+              {isAuthenticated ? "Continue Creating" : "Begin Creating"}
             </Link>
 
             <div className="text-xs opacity-40">

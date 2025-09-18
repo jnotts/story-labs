@@ -21,6 +21,12 @@ ON stories
 FOR ALL
 USING (auth.uid() = user_id);
 
+-- Additional policy for INSERT (some setups need explicit INSERT policy)
+CREATE POLICY "Users can insert their own stories"
+ON stories
+FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
 -- Create updated_at trigger function (if it doesn't exist)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

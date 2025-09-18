@@ -2,14 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -54,7 +46,7 @@ export function ForgotPasswordForm({
               Password reset instructions have been sent to your email.
             </p>
             <p className="text-sm opacity-70">
-              If you don't see the email, check your spam folder.
+              If you don&apos;t see the email, check your spam folder.
             </p>
           </div>
         </div>

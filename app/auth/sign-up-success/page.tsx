@@ -10,7 +10,7 @@ export default function Page() {
               Check your email to confirm your account
             </p>
             <p className="text-sm opacity-70">
-              We've sent a confirmation link to your email. Click it to activate your account and start creating stories.
+              We&apos;ve sent a confirmation link to your email. Click it to activate your account and start creating stories.
             </p>
           </div>
         </div>

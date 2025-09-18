@@ -5,15 +5,17 @@ import { Pillar } from "./pillar";
 
 interface NavPillarProps {
   activeSection?: "create" | "library" | "profile" | "settings";
+  onCreateNew?: () => void;
 }
 
-export function NavPillar({ activeSection = "create" }: NavPillarProps) {
+export function NavPillar({ activeSection = "create", onCreateNew }: NavPillarProps) {
   const navItems = [
     {
       id: "create",
       icon: PencilLine,
       label: "Create",
-      href: "/protected",
+      href: onCreateNew ? undefined : "/protected",
+      onClick: onCreateNew,
       isActive: activeSection === "create",
     },
     {

@@ -50,11 +50,35 @@ CREATE POLICY "Users can CRUD their own stories" ON stories FOR ALL USING (auth.
 - [x] **UPGRADED**: Created infinite writing space with mountain background
 - [x] **UPGRADED**: Implemented seamless text input with hidden scrollbars
 
-### Phase 2B: Story Management UI (20 min) 🚧 NEXT
-- [ ] Connect story creation to Supabase database
-- [ ] Implement save/load story functionality
-- [ ] Create library view for browsing existing stories
-- [ ] Add story CRUD operations (create, read, update, delete)
+### Phase 2B: Story Management Functionality (20 min) 🚧 IN PROGRESS
+#### 1. Database Integration (5 min)
+- [ ] Create story model/types for TypeScript
+- [ ] Add Supabase client functions for story CRUD
+- [ ] Connect textarea and title input to state management
+- [ ] Wire up "Save Draft" button to actually save to database
+
+#### 2. Auto-Save Implementation (5 min)
+- [ ] Add debounced auto-save as user types
+- [ ] Show save status in floating action bar
+- [ ] Handle loading states and error states
+
+#### 3. Library View Creation (7 min)
+- [ ] Build `/protected/library` page using same layout structure
+- [ ] Display stories as minimal glass cards
+- [ ] Add search/filter functionality using right control panel
+- [ ] Enable story selection to load into editor
+
+#### 4. CRUD Operations (3 min)
+- [ ] Load existing story when clicked from library
+- [ ] Update story functionality (auto-save handles this)
+- [ ] Delete story capability
+- [ ] Create new story (reset form)
+
+**Key Components to Build:**
+- `lib/stories.ts` - Supabase story functions
+- `app/protected/library/page.tsx` - Library view
+- `components/story-card.tsx` - Individual story display
+- State management hooks for current story
 
 ### Phase 2C: Polish & Micro-interactions (5 min during Phase 4)
 - [ ] Add subtle animations (fade-in panels, hover glows)
