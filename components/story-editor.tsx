@@ -8,7 +8,7 @@ import { ControlPanel } from "@/components/control-panel";
 import { createStory, updateStory, getStory } from "@/lib/stories";
 import { Story } from "@/lib/types";
 
-export default function ProtectedPage() {
+export function StoryEditor() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
@@ -124,7 +124,7 @@ export default function ProtectedPage() {
     }
 
     // Navigate to fresh create page
-    router.push("/protected");
+    router.push("/create");
   }, [title, content, saveStory, router]);
 
   return (

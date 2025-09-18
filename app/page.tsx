@@ -44,7 +44,7 @@ export default async function Home() {
 
           <div className="space-y-4">
             <Link
-              href={isAuthenticated ? "/protected" : "/auth/login"}
+              href={isAuthenticated ? "/create" : "/auth/login"}
               className="glass-cta inline-block"
             >
               {isAuthenticated ? "Continue Creating" : "Begin Creating"}

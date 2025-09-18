@@ -63,7 +63,7 @@ CREATE POLICY "Users can CRUD their own stories" ON stories FOR ALL USING (auth.
 - [ ] Handle loading states and error states
 
 #### 3. Library View Creation (7 min)
-- [ ] Build `/protected/library` page using same layout structure
+- [ ] Build `/create/library` page using same layout structure
 - [ ] Display stories as minimal glass cards
 - [ ] Add search/filter functionality using right control panel
 - [ ] Enable story selection to load into editor
@@ -76,7 +76,7 @@ CREATE POLICY "Users can CRUD their own stories" ON stories FOR ALL USING (auth.
 
 **Key Components to Build:**
 - `lib/stories.ts` - Supabase story functions
-- `app/protected/library/page.tsx` - Library view
+- `app/create/library/page.tsx` - Library view
 - `components/story-card.tsx` - Individual story display
 - State management hooks for current story
 

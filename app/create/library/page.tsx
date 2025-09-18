@@ -57,7 +57,7 @@ export default function LibraryPage() {
 
   const handleEditStory = (story: Story) => {
     // Navigate to create page with story data
-    router.push(`/protected?edit=${story.id}`);
+    router.push(`/create?edit=${story.id}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -97,7 +97,7 @@ export default function LibraryPage() {
             <div className="text-center space-y-4">
               <p className="opacity-50">No stories yet</p>
               <button
-                onClick={() => router.push('/protected')}
+                onClick={() => router.push('/create')}
                 className="glass-cta"
               >
                 Create Your First Story
