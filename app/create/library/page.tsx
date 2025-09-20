@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { NavPillar } from "@/components/floating-nav";
 import { ControlPanel } from "@/components/control-panel";
 import { getStories, deleteStory } from "@/lib/stories";
@@ -19,23 +18,16 @@ export default function LibraryPage() {
   });
   const router = useRouter();
 
-  // Check auth and load stories
+  // Load stories
   useEffect(() => {
-    const checkAuthAndLoadStories = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getClaims();
-      if (error || !data?.claims) {
-        router.push("/auth/login");
-        return;
-      }
-
+    const loadStories = async () => {
       const fetchedStories = await getStories();
       setStories(fetchedStories);
       setLoading(false);
     };
 
-    checkAuthAndLoadStories();
-  }, [router]);
+    loadStories();
+  }, []);
 
   const handleDeleteStory = (story: Story) => {
     setDeleteModal({ isOpen: true, story });

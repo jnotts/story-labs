@@ -1,11 +1,21 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
-export default function CreateLayout({
+export default async function CreateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getClaims();
+
+  // Redirect to login if not authenticated
+  if (error || !data?.claims) {
+    redirect("/auth/login");
+  }
+
   return (
     <main className="min-h-screen relative">
       {/* Minimal top bar with auth controls */}

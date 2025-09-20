@@ -18,15 +18,23 @@ interface ControlPanelProps {
   onCreateNew?: () => void;
 }
 
-export function ControlPanel({ mode = "create", isEditing = false, onCreateNew }: ControlPanelProps) {
+export function ControlPanel({
+  mode = "create",
+  isEditing = false,
+  onCreateNew,
+}: ControlPanelProps) {
   if (mode === "create") {
     const createControls = [
-      ...(isEditing && onCreateNew ? [{
-        id: "new",
-        icon: Plus,
-        label: "New",
-        onClick: onCreateNew,
-      }] : []),
+      ...(isEditing && onCreateNew
+        ? [
+            {
+              id: "new",
+              icon: Plus,
+              label: "New",
+              onClick: onCreateNew,
+            },
+          ]
+        : []),
       {
         id: "voice",
         icon: Volume2,

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { NavPillar } from "@/components/floating-nav";
 import { ControlPanel } from "@/components/control-panel";
 import { createStory, updateStory, getStory } from "@/lib/stories";
@@ -13,23 +12,18 @@ export function StoryEditor() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">(
+    "saved"
+  );
   const [wordCount, setWordCount] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Check auth and load story if editing
+  // Load story if editing
   useEffect(() => {
-    const checkAuthAndLoadStory = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getClaims();
-      if (error || !data?.claims) {
-        router.push("/auth/login");
-        return;
-      }
-
+    const loadStory = async () => {
       // Check if we're editing an existing story
-      const editId = searchParams.get('edit');
+      const editId = searchParams.get("edit");
       if (editId) {
         const story = await getStory(editId);
         if (story) {
@@ -46,12 +40,15 @@ export function StoryEditor() {
         setSaveStatus("saved");
       }
     };
-    checkAuthAndLoadStory();
-  }, [router, searchParams]);
+    loadStory();
+  }, [searchParams]);
 
   // Update word count
   useEffect(() => {
-    const words = content.trim().split(/\s+/).filter(word => word.length > 0);
+    const words = content
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     setWordCount(words.length);
   }, [content]);
 
@@ -71,7 +68,10 @@ export function StoryEditor() {
         }
       } else {
         // Create new story
-        const newStory = await createStory({ title: title || "Untitled Story", content });
+        const newStory = await createStory({
+          title: title || "Untitled Story",
+          content,
+        });
         if (newStory) {
           setCurrentStory(newStory);
           setSaveStatus("saved");
@@ -181,7 +181,7 @@ export function StoryEditor() {
               text-lg leading-relaxed focus:placeholder:opacity-50 transition-all outline-none"
               style={{
                 overflow: "auto",
-                paddingBottom: "120px"
+                paddingBottom: "120px",
               }}
             />
           </div>
@@ -194,18 +194,26 @@ export function StoryEditor() {
             <div className="w-px h-4 bg-white/10"></div>
             <button
               onClick={saveStory}
-              className={`text-xs transition-opacity w-20 text-center ${
-                saveStatus === "saving" ? "opacity-40" : "opacity-60 hover:opacity-100"
+              className={`text-xs transition-opacity text-center ${
+                saveStatus === "saving"
+                  ? "opacity-40"
+                  : "opacity-60 hover:opacity-100"
               }`}
               disabled={saveStatus === "saving"}
             >
-              {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
+              {saveStatus === "saving"
+                ? "Saving..."
+                : saveStatus === "saved"
+                ? "Saved"
+                : "Save"}
             </button>
-            <Tooltip content="Coming Soon">
-              <button className="text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all opacity-50 cursor-not-allowed">
-                Generate Audio
-              </button>
-            </Tooltip>
+            <div className="">
+              <Tooltip content="Coming Soon">
+                <button className="w-full text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all opacity-50 cursor-not-allowed">
+                  Generate Audio
+                </button>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </main>
