@@ -7,6 +7,7 @@ import { ControlPanel } from "@/components/control-panel";
 import { createStory, updateStory, getStory } from "@/lib/stories";
 import { Story } from "@/lib/types";
 import { useTTS } from "@/lib/hooks/useTTS";
+import { VoiceControlsModal } from "@/components/voice-controls-modal";
 import { Play, Pause, Square, Volume2 } from "lucide-react";
 
 export function StoryEditor() {
@@ -17,6 +18,9 @@ export function StoryEditor() {
     "saved"
   );
   const [wordCount, setWordCount] = useState(0);
+  const [selectedVoice, setSelectedVoice] = useState("pqHfZKP75CvOlQylNhV4");
+  const [speechSpeed, setSpeechSpeed] = useState(1.0);
+  const [isVoiceControlsOpen, setIsVoiceControlsOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,7 +36,8 @@ export function StoryEditor() {
     stop,
   } = useTTS({
     text: content,
-    voiceId: "pqHfZKP75CvOlQylNhV4", // Default voice
+    voiceId: selectedVoice,
+    speed: speechSpeed,
     enabled: true,
   });
 
@@ -155,6 +160,7 @@ export function StoryEditor() {
         mode="create"
         isEditing={!!currentStory}
         onCreateNew={handleCreateNew}
+        onVoiceControlsOpen={() => setIsVoiceControlsOpen((prev) => !prev)}
       />
 
       {/* Central Creative Space */}
@@ -205,8 +211,9 @@ export function StoryEditor() {
         </div>
 
         {/* Floating Action Bar */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
-          <div className="glass-nav px-6 py-2 flex flex-wrap sm:flex-nowrap max-w-xs sm:max-w-md items-center justify-around gap-6">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4">
+          {/* Main Stats & Save Pill */}
+          <div className="glass-nav px-6 py-2 flex items-center gap-6">
             <div className="text-xs opacity-40">{wordCount} words</div>
             <div className="w-px h-4 bg-white/10"></div>
             <button
@@ -224,79 +231,108 @@ export function StoryEditor() {
                 ? "Saved"
                 : "Save"}
             </button>
-            <div className="flex items-center gap-2">
-              {/* Generate Audio Button */}
-              {!audioUrl && (
+          </div>
+
+          {/* Audio Controls Pill */}
+          <div className="glass-nav rounded-full px-4 py-2 flex items-center gap-3">
+            {/* Generate Audio Button */}
+            {!audioUrl && (
+              <button
+                onClick={generate}
+                disabled={isGenerating || !content.trim()}
+                className={`text-xs px-4 py-1 rounded-full transition-all flex items-center gap-2 ${
+                  isGenerating || !content.trim()
+                    ? " opacity-50 cursor-not-allowed"
+                    : " hover:bg-white/20 opacity-80 hover:opacity-100"
+                }`}
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-3 h-3" />
+                    Generate Audio
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Audio Controls */}
+            {audioUrl && (
+              <>
+                <button
+                  onClick={isPlaying ? pause : play}
+                  disabled={isGenerating}
+                  className={`text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2 ${
+                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="w-3 h-3" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3 h-3" />
+                      Play
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={stop}
+                  disabled={isGenerating}
+                  className={`text-xs px-2 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${
+                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <Square className="w-3 h-3" />
+                </button>
+
+                <div className="w-px h-4 bg-white/10"></div>
+
                 <button
                   onClick={generate}
-                  disabled={isGenerating || !content.trim()}
-                  className={`text-xs px-4 py-2 rounded-full transition-all flex items-center gap-2 ${
-                    isGenerating || !content.trim()
-                      ? "bg-white/5 opacity-50 cursor-not-allowed"
-                      : "bg-white/10 hover:bg-white/20 opacity-80 hover:opacity-100"
+                  disabled={isGenerating}
+                  className={`text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2 ${
+                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-60 hover:opacity-100"
                   }`}
                 >
                   {isGenerating ? (
                     <>
                       <div className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
-                      Generating...
+                      Regenerating...
                     </>
                   ) : (
-                    <>
-                      <Volume2 className="w-3 h-3" />
-                      Generate Audio
-                    </>
+                    "Regenerate"
                   )}
                 </button>
-              )}
+              </>
+            )}
 
-              {/* Audio Controls */}
-              {audioUrl && (
-                <div className="flex items-center justify-around gap-2">
-                  <button
-                    onClick={isPlaying ? pause : play}
-                    className="text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-80 hover:opacity-100 flex items-center gap-2"
-                  >
-                    {isPlaying ? (
-                      <>
-                        <Pause className="w-3 h-3" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3" />
-                        Play
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={stop}
-                    className="text-xs px-2 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-60 hover:opacity-100"
-                  >
-                    <Square className="w-3 h-3" />
-                  </button>
-
-                  <button
-                    onClick={generate}
-                    disabled={isGenerating}
-                    className="text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-60 hover:opacity-100"
-                  >
-                    Regenerate
-                  </button>
-                </div>
-              )}
-
-              {/* Error Display */}
-              {ttsError && (
-                <div className="text-xs text-red-400 opacity-70">
-                  {ttsError.message}
-                </div>
-              )}
-            </div>
+            {/* Error Display */}
+            {ttsError && (
+              <div className="text-xs text-red-400 opacity-70">
+                {ttsError.message}
+              </div>
+            )}
           </div>
         </div>
       </main>
+
+      {/* Voice Controls Modal */}
+      <VoiceControlsModal
+        isOpen={isVoiceControlsOpen}
+        onClose={() => setIsVoiceControlsOpen(false)}
+        selectedVoice={selectedVoice}
+        onVoiceSelect={setSelectedVoice}
+        speed={speechSpeed}
+        onSpeedChange={setSpeechSpeed}
+      />
     </div>
   );
 }

@@ -39,6 +39,7 @@
     --accent-neutral: rgba(0, 0, 0, 0.8);
     --accent-light: rgba(0, 0, 0, 0.6);
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -82,35 +83,41 @@
   }
 
   /* Remove all focus outlines for seamless writing experience */
-  input, textarea {
+  input,
+  textarea {
     outline: none !important;
     box-shadow: none !important;
   }
 
-  input:focus, textarea:focus {
+  input:focus,
+  textarea:focus {
     outline: none !important;
     box-shadow: none !important;
   }
 
   /* Hide scrollbars for textarea while maintaining scroll functionality */
   .hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
   }
 
   .hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
+    display: none;
+    /* Safari and Chrome */
   }
 
   /* Prevent main page scroll */
-  html, body {
+  html,
+  body {
     overflow: hidden;
     height: 100vh;
   }
 
   body {
     @apply text-foreground;
-    background-image: url('/images/bg.jpg');
+    background-image: url('/images/bg-tree.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -168,5 +175,42 @@
     background: var(--glass-strong);
     border: 1px solid var(--glass-border);
     @apply backdrop-blur-xl rounded-xl;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom slider styling */
+  .slider {
+    background: linear-gradient(to right, #ecb075c1 0%, #d7822dd1 var(--slider-progress, 33%), rgba(255, 255, 255, 0.1) var(--slider-progress, 33%), rgba(255, 255, 255, 0.1) 100%);
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 }

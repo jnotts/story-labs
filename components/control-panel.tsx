@@ -16,12 +16,14 @@ interface ControlPanelProps {
   mode?: "create" | "library";
   isEditing?: boolean;
   onCreateNew?: () => void;
+  onVoiceControlsOpen?: () => void;
 }
 
 export function ControlPanel({
   mode = "create",
   isEditing = false,
   onCreateNew,
+  onVoiceControlsOpen,
 }: ControlPanelProps) {
   if (mode === "create") {
     const createControls = [
@@ -39,8 +41,8 @@ export function ControlPanel({
         id: "voice",
         icon: Volume2,
         label: "Voice",
-        onClick: () => console.log("Voice settings"),
-        comingSoon: true,
+        onClick: onVoiceControlsOpen || (() => console.log("Voice settings")),
+        comingSoon: false,
       },
       {
         id: "enhance",

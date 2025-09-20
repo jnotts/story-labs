@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 interface TTSOptions {
   text: string;
   voiceId?: string;
+  speed?: number;
   enabled?: boolean;
 }
 
@@ -49,6 +50,7 @@ const generateTTSAudio = async ({
 export const useTTS = ({
   text,
   voiceId = "pqHfZKP75CvOlQylNhV4",
+  speed = 1.0,
   enabled = true,
 }: TTSOptions): TTSResult => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -58,8 +60,8 @@ export const useTTS = ({
   // Only generate if we have text content
   const hasContent = text && text.trim().length > 0;
 
-  // Create cache key for this text + voice combination
-  const cacheKey = ["tts", text.trim(), voiceId];
+  // Create cache key for this text + voice + speed combination
+  const cacheKey = ["tts", text.trim(), voiceId, speed];
 
   // Check if we already have cached audio for this content
   const cachedAudioUrl = queryClient.getQueryData<string>(cacheKey);
@@ -92,25 +94,29 @@ export const useTTS = ({
 
   const play = () => {
     if (currentAudioUrl && !isPlaying) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
+      // If no audio element exists or URL changed, create new one
+      if (!audioRef.current || audioRef.current.src !== currentAudioUrl) {
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+
+        const audio = new Audio(currentAudioUrl);
+        audioRef.current = audio;
+
+        // Set playback speed
+        audio.playbackRate = speed;
+
+        audio.addEventListener("ended", () => {
+          setIsPlaying(false);
+        });
+
+        audio.addEventListener("error", () => {
+          setIsPlaying(false);
+        });
       }
 
-      const audio = new Audio(currentAudioUrl);
-      audioRef.current = audio;
-
-      audio.addEventListener("ended", () => {
-        setIsPlaying(false);
-        audioRef.current = null;
-      });
-
-      audio.addEventListener("error", () => {
-        setIsPlaying(false);
-        audioRef.current = null;
-      });
-
-      audio
+      // Play the existing audio (resumes from pause position)
+      audioRef.current
         .play()
         .then(() => {
           setIsPlaying(true);
@@ -118,13 +124,12 @@ export const useTTS = ({
         .catch((error) => {
           console.error("Audio playback failed:", error);
           setIsPlaying(false);
-          audioRef.current = null;
         });
     }
   };
 
   const pause = () => {
-    if (audioRef.current) {
+    if (audioRef.current && isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     }
