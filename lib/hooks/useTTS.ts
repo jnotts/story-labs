@@ -72,6 +72,7 @@ export const useTTS = ({
     isPending: isLoading,
     error,
   } = useMutation({
+    mutationKey: cacheKey,
     mutationFn: generateTTSAudio,
     onSuccess: (data) => {
       // Cache the result for future use
@@ -89,6 +90,9 @@ export const useTTS = ({
   const generate = () => {
     if (hasContent && enabled) {
       mutate({ text: text.trim(), voiceId });
+    }
+    if (isPlaying) {
+      stop(); // Stop playback if generating new audio
     }
   };
 

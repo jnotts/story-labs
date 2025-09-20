@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    console.log(process.env.ELEVENLABS_API_KEY);
     console.log("Generating TTS...");
 
     // 2. Initialize ElevenLabs client

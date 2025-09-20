@@ -1,191 +1,152 @@
-# StoryForge MVP - 2 Hour Speed-Run Plan
+# StoryForge - Interactive Storytelling Platform
 
-## Goal
-Build and deploy a functional interactive storytelling app with Supabase auth and ElevenLabs TTS in 120 minutes MAX.
+## Current Status: MVP COMPLETE ✅
+Core storytelling app with TTS integration successfully built and functional.
 
-## Time Allocation (2 hours total)
-- **Setup & Auth (30 min)**: Supabase config, basic auth flow
-- **Core Story CRUD (40 min)**: Database schema, story creation/editing
-- **ElevenLabs Integration (35 min)**: TTS API, audio playback
-- **Polish & Deploy (15 min)**: Final touches, Vercel deployment
+## Completed Features
+- ✅ Supabase authentication and database
+- ✅ Story CRUD operations with auto-save
+- ✅ ElevenLabs TTS integration with SDK
+- ✅ Voice selection modal with previews
+- ✅ Audio playback controls with proper states
+- ✅ Glassmorphism UI with floating panels
+- ✅ Responsive design and animations
 
----
+## Next Phase: AI Writing Assistant
 
-## Phase 1: Foundation Setup (0-30 min)
+### Goal
+Add AI-powered text generation to help users overcome writer's block and enhance creativity.
 
-### Supabase Setup (15 min)
-- [ ] Create Supabase project
-- [ ] Configure environment variables
-- [ ] Set up auth providers (email + Google OAuth)
-- [ ] Test auth connection
+### Features to Implement
+1. **Story Inspiration System**
+   - Genre-based story prompts
+   - Character and plot suggestions
+   - Writing style templates
 
-### Database Schema (15 min)
-```sql
--- stories table
-CREATE TABLE stories (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  title text NOT NULL,
-  content text NOT NULL,
-  narrator_voice text DEFAULT 'alloy',
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now()
-);
+2. **AI Writing Assistant**
+   - Context-aware text completion
+   - Paragraph continuation
+   - Creative writing suggestions
 
--- RLS policies
-ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can CRUD their own stories" ON stories FOR ALL USING (auth.uid() = user_id);
-```
+3. **Smart Integration**
+   - Empty state inspiration prompts
+   - Inline AI assistance controls
+   - Seamless text insertion
 
----
+### Implementation Roadmap
 
-## Phase 2: Core Story Management + Glassmorphism UI (30-70 min)
+#### Phase 1: AI Infrastructure (30-45 min)
+1. **API Setup**
+   - Create `/api/ai/generate` endpoint
+   - Choose AI provider (OpenAI/Anthropic)
+   - Configure API keys and rate limiting
 
-### Phase 2A: Core Layout Foundation ✅ COMPLETE
-- [x] Replace generic dashboard with floating glass panel layout
-- [x] Implement base color palette (light/dark backgrounds, glass panels)
-- [x] Set up custom CSS variables for glassmorphism effects
-- [x] Create floating navigation component (minimal, side/overlay)
-- [x] **UPGRADED**: Built unified pillar system for nav + controls
-- [x] **UPGRADED**: Created infinite writing space with mountain background
-- [x] **UPGRADED**: Implemented seamless text input with hidden scrollbars
+2. **Story Prompts System**
+   - Create prompts database/constants
+   - Genre categorization (Fantasy, Sci-Fi, Mystery, etc.)
+   - Dynamic prompt generation based on user preferences
 
-### Phase 2B: Story Management Functionality (20 min) 🚧 IN PROGRESS
-#### 1. Database Integration (5 min)
-- [ ] Create story model/types for TypeScript
-- [ ] Add Supabase client functions for story CRUD
-- [ ] Connect textarea and title input to state management
-- [ ] Wire up "Save Draft" button to actually save to database
+#### Phase 2: UI Integration (45-60 min)
+3. **Empty State Enhancement**
+   - Replace "Once upon a time..." placeholder
+   - Add story starter suggestions
+   - Genre selection interface
 
-#### 2. Auto-Save Implementation (5 min)
-- [ ] Add debounced auto-save as user types
-- [ ] Show save status in floating action bar
-- [ ] Handle loading states and error states
+4. **AI Assistant Controls**
+   - Add AI button to floating action bar
+   - Context menu for AI options
+   - Text insertion and replacement interface
 
-#### 3. Library View Creation (7 min)
-- [ ] Build `/create/library` page using same layout structure
-- [ ] Display stories as minimal glass cards
-- [ ] Add search/filter functionality using right control panel
-- [ ] Enable story selection to load into editor
+#### Phase 3: Smart Features (30-45 min)
+5. **Context-Aware Generation**
+   - Analyze existing story content
+   - Generate relevant continuations
+   - Character and plot consistency
 
-#### 4. CRUD Operations (3 min)
-- [ ] Load existing story when clicked from library
-- [ ] Update story functionality (auto-save handles this)
-- [ ] Delete story capability
-- [ ] Create new story (reset form)
+6. **Writing Tools**
+   - Paragraph completion
+   - Dialogue enhancement
+   - Scene transitions
 
-**Key Components to Build:**
-- `lib/stories.ts` - Supabase story functions
-- `app/create/library/page.tsx` - Library view
-- `components/story-card.tsx` - Individual story display
-- State management hooks for current story
-
-### Phase 2C: Polish & Micro-interactions (5 min during Phase 4)
-- [ ] Add subtle animations (fade-in panels, hover glows)
-- [ ] Implement scroll parallax effects
-- [ ] Add breathing shadows and micro-interactions
-
-### UI Design Decisions:
-- **Skip generic shadcn styling** - use components but heavily customize
-- **Focus on glass panels** over traditional cards/containers
-- **Storytelling flow** - scroll-based navigation, not rigid nav bars
-- **Gradient accents** for CTAs (indigo→purple, teal highlights)
-- **Floating audio player** for Phase 3
-
-### Technical Approach:
-- Custom CSS classes for glassmorphism effects
-- Tailwind utilities + custom properties for gradients
-- Framer Motion or CSS animations for scroll effects
-- Replace default shadcn styles with glass aesthetic
+### Technical Implementation
+- **AI Provider**: OpenAI GPT-4 or Anthropic Claude
+- **Context Management**: Track story context for continuations
+- **UI Integration**: Seamless text insertion without disrupting flow
+- **Caching**: Store generated suggestions for performance
 
 ---
 
-## Phase 3: ElevenLabs Integration (70-105 min)
+## Completed MVP Components ✅
 
-### API Setup (10 min)
-- [ ] ElevenLabs API key configuration
-- [ ] Create `/api/tts` endpoint
-- [ ] Voice list fetching
+### Foundation
+- [x] Supabase project setup
+- [x] Authentication flow (email + Google OAuth)
+- [x] Database schema and RLS policies
+- [x] Environment configuration
 
-### TTS Implementation (25 min)
-- [ ] Text-to-speech generation function
-- [ ] Audio player component
-- [ ] "Generate Audio" button in story editor
-- [ ] Loading states and error handling
+### Core Features
+- [x] Story CRUD operations with TypeScript types
+- [x] Auto-save functionality with debouncing
+- [x] Library view with story management
+- [x] Glassmorphism UI with floating panels
 
----
+### Audio Integration
+- [x] ElevenLabs SDK integration
+- [x] TTS endpoint with voice selection
+- [x] Audio playback controls
+- [x] Voice preview system
+- [x] Loading states and error handling
 
-## Phase 4: Polish & Deploy (105-120 min)
-
-### Final Touches (10 min)
-- [ ] Basic responsive design
-- [ ] Loading spinners
-- [ ] Error messages
-- [ ] Audio controls (play/pause/stop)
-
-### Deployment (5 min)
-- [ ] Push to GitHub
-- [ ] Deploy to Vercel
-- [ ] Test production build
+### Polish & Deployment
+- [x] Responsive design
+- [x] Smooth animations and transitions
+- [x] Production deployment ready
 
 ---
 
-## MVP Feature Scope (STRICT)
-
-###  INCLUDE
-- Email auth (Supabase)
-- Story CRUD operations
-- Single narrator voice per story
-- Generate audio on-demand (no caching)
-- Basic responsive UI
-
-### L EXCLUDE (Future features)
-- Character voices
-- Sound effects
-- Real-time collaboration
-- Story sharing/library
-- Audio caching/storage
-- Complex text editor
-- Analytics
-
----
-
-## Tech Stack (Confirmed)
-- **Frontend**: Next.js 14 (App Router), React, TailwindCSS
-- **UI**: shadcn/ui components
+## Tech Stack
+- **Frontend**: Next.js 14 (App Router), React 19, TailwindCSS
+- **UI**: shadcn/ui components with custom glassmorphism
 - **Backend**: Supabase (auth + database)
-- **TTS**: ElevenLabs API
+- **TTS**: ElevenLabs SDK
+- **AI**: OpenAI GPT-4 / Anthropic Claude (TBD)
+- **State Management**: TanStack Query
 - **Deployment**: Vercel
 
 ---
 
-## API Endpoints Needed
+## API Endpoints
 ```
-GET  /api/voices        # Get available ElevenLabs voices
-POST /api/tts           # Generate audio from text
+POST /api/tts           # Generate audio from text + voice settings
+POST /api/ai/generate   # AI text generation and story assistance
 ```
 
 ---
 
-## Database Schema (Final)
+## Database Schema
 ```sql
 stories:
 - id (uuid, primary key)
 - user_id (uuid, foreign key to auth.users)
 - title (text, required)
 - content (text, required)
-- narrator_voice (text, default 'alloy')
+- narrator_voice (text, default 'pqHfZKP75CvOlQylNhV4')
 - created_at (timestamp)
 - updated_at (timestamp)
 ```
 
 ---
 
-## Success Criteria
-1.  User can sign up/login
-2.  User can create/edit/delete stories
-3.  User can select narrator voice
-4.  User can generate and play audio of their story
-5.  App is deployed and accessible via URL
+## Success Criteria - MVP ✅
+1. ✅ User authentication and story management
+2. ✅ Rich text editing with auto-save
+3. ✅ Multiple voice narrators with previews
+4. ✅ High-quality audio generation and playback
+5. ✅ Polished glassmorphism UI
+6. ✅ Production deployment
 
-**Estimated completion: 120 minutes or less**
+## Next Milestone - AI Assistant
+1. 🎯 Story inspiration and prompts
+2. 🎯 Context-aware text generation
+3. 🎯 Seamless writing assistance integration
+4. 🎯 Enhanced empty state experience
