@@ -6,7 +6,8 @@ import { NavPillar } from "@/components/floating-nav";
 import { ControlPanel } from "@/components/control-panel";
 import { createStory, updateStory, getStory } from "@/lib/stories";
 import { Story } from "@/lib/types";
-import { Tooltip } from "@/components/tooltip";
+import { useTTS } from "@/lib/hooks/useTTS";
+import { Play, Pause, Square, Volume2 } from "lucide-react";
 
 export function StoryEditor() {
   const [title, setTitle] = useState("");
@@ -18,6 +19,22 @@ export function StoryEditor() {
   const [wordCount, setWordCount] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // TTS functionality
+  const {
+    audioUrl,
+    isLoading: isGenerating,
+    error: ttsError,
+    generate,
+    isPlaying,
+    play,
+    pause,
+    stop,
+  } = useTTS({
+    text: content,
+    voiceId: "pqHfZKP75CvOlQylNhV4", // Default voice
+    enabled: true,
+  });
 
   // Load story if editing
   useEffect(() => {
@@ -189,7 +206,7 @@ export function StoryEditor() {
 
         {/* Floating Action Bar */}
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
-          <div className="glass-nav px-6 py-3 flex items-center gap-6">
+          <div className="glass-nav px-6 py-2 flex flex-wrap sm:flex-nowrap max-w-xs sm:max-w-md items-center justify-around gap-6">
             <div className="text-xs opacity-40">{wordCount} words</div>
             <div className="w-px h-4 bg-white/10"></div>
             <button
@@ -207,12 +224,75 @@ export function StoryEditor() {
                 ? "Saved"
                 : "Save"}
             </button>
-            <div className="">
-              <Tooltip content="Coming Soon">
-                <button className="w-full text-xs bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 transition-all opacity-50 cursor-not-allowed">
-                  Generate Audio
+            <div className="flex items-center gap-2">
+              {/* Generate Audio Button */}
+              {!audioUrl && (
+                <button
+                  onClick={generate}
+                  disabled={isGenerating || !content.trim()}
+                  className={`text-xs px-4 py-2 rounded-full transition-all flex items-center gap-2 ${
+                    isGenerating || !content.trim()
+                      ? "bg-white/5 opacity-50 cursor-not-allowed"
+                      : "bg-white/10 hover:bg-white/20 opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  {isGenerating ? (
+                    <>
+                      <div className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3 h-3" />
+                      Generate Audio
+                    </>
+                  )}
                 </button>
-              </Tooltip>
+              )}
+
+              {/* Audio Controls */}
+              {audioUrl && (
+                <div className="flex items-center justify-around gap-2">
+                  <button
+                    onClick={isPlaying ? pause : play}
+                    className="text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-80 hover:opacity-100 flex items-center gap-2"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <Pause className="w-3 h-3" />
+                        Pause
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3 h-3" />
+                        Play
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={stop}
+                    className="text-xs px-2 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-60 hover:opacity-100"
+                  >
+                    <Square className="w-3 h-3" />
+                  </button>
+
+                  <button
+                    onClick={generate}
+                    disabled={isGenerating}
+                    className="text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all opacity-60 hover:opacity-100"
+                  >
+                    Regenerate
+                  </button>
+                </div>
+              )}
+
+              {/* Error Display */}
+              {ttsError && (
+                <div className="text-xs text-red-400 opacity-70">
+                  {ttsError.message}
+                </div>
+              )}
             </div>
           </div>
         </div>
