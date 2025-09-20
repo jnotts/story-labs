@@ -8,6 +8,7 @@ import { createStory, updateStory, getStory } from "@/lib/stories";
 import { Story } from "@/lib/types";
 import { useTTS } from "@/lib/hooks/useTTS";
 import { VoiceControlsModal } from "@/components/voice-controls-modal";
+import { RATE_LIMITS } from "@/lib/constants";
 import { Play, Pause, Square, Volume2 } from "lucide-react";
 
 export function StoryEditor() {
@@ -17,7 +18,9 @@ export function StoryEditor() {
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">(
     "saved"
   );
-  const [wordCount, setWordCount] = useState(0);
+  const [remainingGenerations, setRemainingGenerations] = useState<
+    number | null
+  >(null);
   const [selectedVoice, setSelectedVoice] = useState("pqHfZKP75CvOlQylNhV4");
   const [speechSpeed, setSpeechSpeed] = useState(1.0);
   const [isVoiceControlsOpen, setIsVoiceControlsOpen] = useState(false);
@@ -29,7 +32,7 @@ export function StoryEditor() {
     audioUrl,
     isLoading: isGenerating,
     error: ttsError,
-    generate,
+    generate: originalGenerate,
     isPlaying,
     play,
     pause,
@@ -40,6 +43,15 @@ export function StoryEditor() {
     speed: speechSpeed,
     enabled: true,
   });
+
+  // Wrap generate to update remaining count
+  const generate = () => {
+    originalGenerate();
+    // Optimistically update remaining count
+    if (remainingGenerations !== null && remainingGenerations > 0) {
+      setRemainingGenerations(remainingGenerations - 1);
+    }
+  };
 
   // Load story if editing
   useEffect(() => {
@@ -65,14 +77,22 @@ export function StoryEditor() {
     loadStory();
   }, [searchParams]);
 
-  // Update word count
+  // Fetch remaining generations on load
   useEffect(() => {
-    const words = content
-      .trim()
-      .split(/\s+/)
-      .filter((word) => word.length > 0);
-    setWordCount(words.length);
-  }, [content]);
+    const fetchUsage = async () => {
+      try {
+        const response = await fetch("/api/usage");
+        if (response.ok) {
+          const data = await response.json();
+          const used = data.tts_generations_count || 0;
+          setRemainingGenerations(RATE_LIMITS.TTS_GENERATIONS_PER_DAY - used);
+        }
+      } catch (error) {
+        console.error("Error fetching usage:", error);
+      }
+    };
+    fetchUsage();
+  }, []);
 
   // Save story function
   const saveStory = useCallback(async () => {
@@ -138,6 +158,14 @@ export function StoryEditor() {
   }, [title, content, saveStatus, saveStory]);
 
   // Create new story function
+  // Handle text change with length limits
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    if (newContent.length <= RATE_LIMITS.MAX_TTS_LENGTH) {
+      setContent(newContent);
+    }
+  };
+
   const handleCreateNew = useCallback(async () => {
     const hasContent = title.trim() || content.trim();
 
@@ -185,9 +213,9 @@ export function StoryEditor() {
                 placeholder="Untitled Story"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-transparent rounded-lg px-4 py-3 text-2xl font-light text-center
-                 placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0
-                 focus:placeholder:opacity-50  transition-all outline-none"
+                className="w-full bg-transparent rounded-lg px-4 py-3 text-2xl text-center story-title
+                 placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:opacity-70 focus:outline-none focus:ring-0
+                 focus:placeholder:opacity-50 transition-all outline-none"
               />
             </div>
             <div className="h-px bg-white/5 mt-4 mx-auto w-32"></div>
@@ -198,10 +226,10 @@ export function StoryEditor() {
             <textarea
               placeholder="Once upon a time..."
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full h-full bg-[#ffffff01] rounded-2xl p-6 resize-none hide-scrollbar
-              placeholder:text-gray-500 dark:placeholder:text-gray-400 placeholder:opacity-70 focus:outline-none focus:ring-0
-              text-lg leading-relaxed focus:placeholder:opacity-50 transition-all outline-none"
+              onChange={handleContentChange}
+              className="w-full h-full bg-[#ffffff01] rounded-2xl p-6 resize-none hide-scrollbar story-text
+              placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:opacity-70 focus:outline-none focus:ring-0
+              text-lg focus:placeholder:opacity-50 transition-all outline-none"
               style={{
                 overflow: "auto",
                 paddingBottom: "120px",
@@ -214,7 +242,15 @@ export function StoryEditor() {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4">
           {/* Main Stats & Save Pill */}
           <div className="glass-nav px-6 py-2 flex items-center gap-6">
-            <div className="text-xs opacity-40">{wordCount} words</div>
+            <div
+              className={`text-xs ${
+                content.length > RATE_LIMITS.MAX_TTS_LENGTH * 0.9
+                  ? "text-orange-400 opacity-80"
+                  : "opacity-40"
+              }`}
+            >
+              {content.length}/{RATE_LIMITS.MAX_TTS_LENGTH}
+            </div>
             <div className="w-px h-4 bg-white/10"></div>
             <button
               onClick={saveStory}
@@ -237,27 +273,37 @@ export function StoryEditor() {
           <div className="glass-nav rounded-full px-4 py-2 flex items-center gap-3">
             {/* Generate Audio Button */}
             {!audioUrl && (
-              <button
-                onClick={generate}
-                disabled={isGenerating || !content.trim()}
-                className={`text-xs px-4 py-1 rounded-full transition-all flex items-center gap-2 ${
-                  isGenerating || !content.trim()
-                    ? " opacity-50 cursor-not-allowed"
-                    : " hover:bg-white/20 opacity-80 hover:opacity-100"
-                }`}
-              >
-                {isGenerating ? (
-                  <>
-                    <div className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Volume2 className="w-3 h-3" />
-                    Generate Audio
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={generate}
+                  disabled={
+                    isGenerating ||
+                    !content.trim() ||
+                    content.trim().length > RATE_LIMITS.MAX_TTS_LENGTH ||
+                    remainingGenerations === 0
+                  }
+                  className={`text-xs px-4 py-1 rounded-full transition-all flex items-center gap-2 ${
+                    isGenerating ||
+                    !content.trim() ||
+                    content.trim().length > RATE_LIMITS.MAX_TTS_LENGTH ||
+                    remainingGenerations === 0
+                      ? " opacity-50 cursor-not-allowed"
+                      : " hover:bg-white/20 opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  {isGenerating ? (
+                    <>
+                      <div className="w-3 h-3 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3 h-3" />
+                      Generate Audio
+                    </>
+                  )}
+                </button>
+              </div>
             )}
 
             {/* Audio Controls */}
@@ -267,7 +313,9 @@ export function StoryEditor() {
                   onClick={isPlaying ? pause : play}
                   disabled={isGenerating}
                   className={`text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2 ${
-                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-80 hover:opacity-100"
+                    isGenerating
+                      ? "opacity-50 cursor-not-allowed"
+                      : "opacity-80 hover:opacity-100"
                   }`}
                 >
                   {isPlaying ? (
@@ -287,7 +335,9 @@ export function StoryEditor() {
                   onClick={stop}
                   disabled={isGenerating}
                   className={`text-xs px-2 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${
-                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-60 hover:opacity-100"
+                    isGenerating
+                      ? "opacity-50 cursor-not-allowed"
+                      : "opacity-60 hover:opacity-100"
                   }`}
                 >
                   <Square className="w-3 h-3" />
@@ -299,7 +349,9 @@ export function StoryEditor() {
                   onClick={generate}
                   disabled={isGenerating}
                   className={`text-xs px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2 ${
-                    isGenerating ? "opacity-50 cursor-not-allowed" : "opacity-60 hover:opacity-100"
+                    isGenerating
+                      ? "opacity-50 cursor-not-allowed"
+                      : "opacity-60 hover:opacity-100"
                   }`}
                 >
                   {isGenerating ? (
@@ -312,6 +364,15 @@ export function StoryEditor() {
                   )}
                 </button>
               </>
+            )}
+            {remainingGenerations !== null && (
+              <div
+                className={`text-xs px-2 py-1 rounded-full bg-white/5 ${
+                  remainingGenerations === 0 ? "text-red-400" : "text-white/60"
+                }`}
+              >
+                {remainingGenerations} remaining today
+              </div>
             )}
 
             {/* Error Display */}

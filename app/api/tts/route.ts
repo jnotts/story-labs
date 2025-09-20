@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, incrementTTSUsage } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,16 +18,39 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // 2. Check authentication
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    // 3. Check rate limits
+    const trimmedText = text.trim();
+    const rateCheck = await checkRateLimit(user.id, trimmedText.length);
+
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: rateCheck.reason,
+          usage: rateCheck.current
+        },
+        { status: 429 }
+      );
+    }
+
     console.log("Generating TTS...");
 
-    // 2. Initialize ElevenLabs client
+    // 4. Initialize ElevenLabs client
     const elevenlabs = new ElevenLabsClient({
       apiKey: process.env.ELEVENLABS_API_KEY,
     });
 
-    // 3. Generate audio using ElevenLabs SDK
+    // 5. Generate audio using ElevenLabs SDK
     const audioStream = await elevenlabs.textToSpeech.convert(voice_id, {
-      text,
+      text: trimmedText,
       modelId: "eleven_turbo_v2",
       outputFormat: "mp3_44100_128",
       voiceSettings: {
@@ -34,7 +59,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 4. Convert stream to buffer
+    // 6. Convert stream to buffer
     const chunks: Uint8Array[] = [];
     const reader = audioStream.getReader();
 
@@ -48,7 +73,7 @@ export async function POST(request: NextRequest) {
       reader.releaseLock();
     }
 
-    // 5. Combine chunks into single buffer
+    // 7. Combine chunks into single buffer
     const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
     const audioBuffer = new Uint8Array(totalLength);
     let offset = 0;
@@ -57,7 +82,10 @@ export async function POST(request: NextRequest) {
       offset += chunk.length;
     }
 
-    // 6. Return audio
+    // 8. Update usage tracking
+    await incrementTTSUsage(user.id, trimmedText.length);
+
+    // 9. Return audio
     return new NextResponse(audioBuffer, {
       headers: {
         "Content-Type": "audio/mpeg",

@@ -41,3 +41,48 @@ CREATE TRIGGER update_stories_updated_at
     BEFORE UPDATE ON stories
     FOR EACH ROW
     EXECUTE PROCEDURE update_updated_at_column();
+
+-- Create user_usage table for rate limiting
+CREATE TABLE user_usage (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date DEFAULT CURRENT_DATE,
+  tts_generations_count integer DEFAULT 0,
+  total_characters_generated integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  UNIQUE(user_id, date)
+);
+
+-- Enable Row Level Security for user_usage
+ALTER TABLE user_usage ENABLE ROW LEVEL SECURITY;
+
+-- Create policy: Users can only access their own usage data
+CREATE POLICY "Users can access their own usage"
+ON user_usage
+FOR ALL
+USING (auth.uid() = user_id);
+
+-- Create trigger for user_usage updated_at
+CREATE TRIGGER update_user_usage_updated_at
+    BEFORE UPDATE ON user_usage
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+-- Create function to increment TTS usage
+CREATE OR REPLACE FUNCTION increment_tts_usage(
+    user_id_param uuid,
+    characters_param integer,
+    date_param date
+)
+RETURNS void AS $$
+BEGIN
+    INSERT INTO user_usage (user_id, date, tts_generations_count, total_characters_generated)
+    VALUES (user_id_param, date_param, 1, characters_param)
+    ON CONFLICT (user_id, date)
+    DO UPDATE SET
+        tts_generations_count = user_usage.tts_generations_count + 1,
+        total_characters_generated = user_usage.total_characters_generated + characters_param,
+        updated_at = now();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

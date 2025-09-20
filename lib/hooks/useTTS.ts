@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
+import { RATE_LIMITS } from "@/lib/constants";
 
 interface TTSOptions {
   text: string;
@@ -89,7 +90,13 @@ export const useTTS = ({
 
   const generate = () => {
     if (hasContent && enabled) {
-      mutate({ text: text.trim(), voiceId });
+      // Check if text exceeds TTS length limit
+      const trimmedText = text.trim();
+      if (trimmedText.length > RATE_LIMITS.MAX_TTS_LENGTH) {
+        console.error("Text too long for TTS generation");
+        return;
+      }
+      mutate({ text: trimmedText, voiceId });
     }
     if (isPlaying) {
       stop(); // Stop playback if generating new audio

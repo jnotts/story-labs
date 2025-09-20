@@ -35,7 +35,7 @@ const ThemeSwitcher = () => {
             <Sun
               key="light"
               size={ICON_SIZE}
-              className={"text-muted-foreground"}
+              className={"text-orange-400 opacity-80 dark:text-muted-foreground"}
             />
           ) : theme === "dark" ? (
             <Moon
