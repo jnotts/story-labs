@@ -48,22 +48,22 @@ export function SignUpForm({
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    const supabase = createClient();
-    setError(null);
+  // const handleGoogleSignUp = async () => {
+  //   const supabase = createClient();
+  //   setError(null);
 
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      });
-      if (error) throw error;
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
+  //   try {
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: 'google',
+  //       options: {
+  //         redirectTo: `${window.location.origin}/auth/callback`
+  //       }
+  //     });
+  //     if (error) throw error;
+  //   } catch (error: unknown) {
+  //     setError(error instanceof Error ? error.message : "An error occurred");
+  //   }
+  // };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
