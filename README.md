@@ -1,6 +1,6 @@
 # Story Labs
 
-Interactive storytelling app with AI narration - initial build in a 2-hour speed-run.
+Interactive storytelling app with AI narration.
 
 ## Project Brief
 Create an interactive storytelling platform where users write stories and generate AI narration. Focus on creative writing experience with glassmorphism UI over mountain backgrounds.
@@ -24,12 +24,9 @@ Create an interactive storytelling platform where users write stories and genera
 - ✅ Glassmorphism UI with mountain background
 - ✅ Real-time word count and save status
 - ✅ Responsive floating navigation pillars
-
-## Coming Soon
-- 🎯 ElevenLabs TTS integration for voice narration
-- 🎯 Voice selection per story
-- 🎯 Audio playback controls
-- 🎯 Story sharing capabilities
+- ✅ ElevenLabs TTS integration for voice narration
+- ✅ Voice selection per story
+- ✅ Audio playback controls
 
 ## Setup
 
